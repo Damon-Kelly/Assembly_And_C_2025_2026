@@ -15,9 +15,21 @@ START:                  ; first instruction of program
     MOVE.B  $3020,  D1
     MOVE.W  D1, D3
     
-    MOVE.L  #$FFFF,   $3030
-    MOVE.W  #$EE,   $3030
-    MOVE.B  #$DD,   $3030
+    MOVE.L  #$EEEE,   $3030
+    MOVE.W  #$DD,   $3030
+    MOVE.B  #$CC,   $3030
+    
+    MOVE.W  #2005,  D2
+    MOVE.B  D2, $3040
+    MOVE.L  D2, $3040
+    
+    MOVE.B  #%01,   $3050
+    MOVE.W  $3050,  A1
+    MOVE.L  $3050,  A2
+    
+    MOVE.B  D2, $3060
+    MOVE.W  D3, A0
+    MOVE.L  A0, D4
 
     SIMHALT             ; halt simulator
 
