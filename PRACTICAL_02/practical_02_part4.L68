@@ -1,0 +1,51 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 19/01/2026 16:14:17
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : practical_02_part4
+00000000                             3  * Written by : Damon Kelly
+00000000                             4  * Date       : 19/01/2026
+00000000                             5  * Description: Complete scecifications
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8  START:                  ; first instruction of program
+00001000                             9  
+00001000  21FC 1234ABCD 3000        10      MOVE.L  #$1234ABCD, $3000
+00001008  303C 07D5                 11      MOVE.W  #%11111010101,   D0
+0000100C  11FC 001B 3010            12      MOVE.B  #27, $3010
+00001012                            13      
+00001012  31C0 3020                 14      MOVE.W  D0,  $3020
+00001016  1238 3020                 15      MOVE.B  $3020,  D1
+0000101A  3601                      16      MOVE.W  D1, D3
+0000101C                            17      
+0000101C  21FC 0000EEEE 3030        18      MOVE.L  #$EEEE,   $3030
+00001024  31FC 00DD 3030            19      MOVE.W  #$DD,   $3030
+0000102A  11FC 00CC 3030            20      MOVE.B  #$CC,   $3030
+00001030                            21      
+00001030  343C 07D5                 22      MOVE.W  #2005,  D2
+00001034  11C2 3040                 23      MOVE.B  D2, $3040
+00001038  21C2 3040                 24      MOVE.L  D2, $3040
+0000103C                            25      
+0000103C  11FC 0001 3050            26      MOVE.B  #%01,   $3050
+00001042  3278 3050                 27      MOVE.W  $3050,  A1
+00001046  2478 3050                 28      MOVE.L  $3050,  A2
+0000104A                            29      
+0000104A  11C2 3060                 30      MOVE.B  D2, $3060
+0000104E  3043                      31      MOVE.W  D3, A0
+00001050  2808                      32      MOVE.L  A0, D4
+00001052                            33  
+00001052  FFFF FFFF                 34      SIMHALT             ; halt simulator
+00001056                            35  
+00001056                            36  * Put variables and constants here
+00001056                            37  
+00001056                            38      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+START               1000
