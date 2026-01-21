@@ -1,27 +1,27 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 19/01/2026 15:48:41
+Created On: 21/01/2026 15:46:11
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : practical_02_part2
 00000000                             3  * Written by : Damon Kelly
 00000000                             4  * Date       : 19/01/2026
-00000000                             5  * Description: Debug
+00000000                             5  * Description: Understand assembly
 00000000                             6  *-----------------------------------------------------------
 00001000                             7      ORG    $1000
 00001000                             8  START:                  ; first instruction of program
 00001000                             9  
-00001000  7004                      10      MOVE.L  #%100,  D0
-00001002  223C 00000100             11      MOVE.L  #$100,  D1
-00001008  7464                      12      MOVE.L  #100,   D2
+00001000  7004                      10      MOVE.L  #%100,  D0  ; moves 32-bit binary 100 into D0
+00001002  223C 00000100             11      MOVE.L  #$100,  D1  ; moves hex 100 into D1
+00001008  7464                      12      MOVE.L  #100,   D2  ; moves decimal 100 into D2
 0000100A                            13      
-0000100A  21C0 3000                 14      MOVE.L  D0, $3000
-0000100E  21C1 3010                 15      MOVE.L  D1, $3010
-00001012  21C2 3020                 16      MOVE.L  D2, $3020
+0000100A  21C0 3000                 14      MOVE.L  D0, $3000   ; moves the value stored in D0 into memory location 3000
+0000100E  21C1 3010                 15      MOVE.L  D1, $3010   ; moves whats in D1 into 3010
+00001012  21C2 3020                 16      MOVE.L  D2, $3020   ; moves whats in D2 into 3030
 00001016                            17      
-00001016  31FC 0064 3020            18      MOVE.W  #100, $3020
-0000101C  31FC 0100 3010            19      MOVE.W  #$100, $3010
-00001022  31FC 0004 3000            20      MOVE.W  #%100, $3000
+00001016  31FC 0064 3020            18      MOVE.W  #100, $3020 ; moves 16-bit decimal vslue 100 into 3020
+0000101C  31FC 0100 3010            19      MOVE.W  #$100, $3010    ; moves hex 100(16-bit) to 3010
+00001022  31FC 0004 3000            20      MOVE.W  #%100, $3000    ; moves binary 100 to 3000
 00001028                            21  
 00001028  FFFF FFFF                 22      SIMHALT             ; halt simulator
 0000102C                            23  

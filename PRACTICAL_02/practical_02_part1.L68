@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 19/01/2026 15:27:42
+Created On: 21/01/2026 15:45:58
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : practical_02_part1
@@ -11,13 +11,13 @@ Created On: 19/01/2026 15:27:42
 00001000                             7      ORG    $1000
 00001000                             8  START:                  ; first instruction of program
 00001000                             9  
-00001000  7004                      10      MOVE.L  #%100,  D0
-00001002  223C 00000100             11      MOVE.L  #$100,  D1
-00001008  7464                      12      MOVE.L  #100,   D2
+00001000  7004                      10      MOVE.L  #%100,  D0  ; move binary 100 into D0, .L is 32 bits
+00001002  223C 00000100             11      MOVE.L  #$100,  D1  ; moves hex 100 into D1
+00001008  7464                      12      MOVE.L  #100,   D2  ; move decimal 100 into D2
 0000100A                            13      
-0000100A  21C0 3000                 14      MOVE.L  D0, $3000
-0000100E  21C1 3010                 15      MOVE.L  D1, $3010
-00001012  21C2 3020                 16      MOVE.L  D2, $3020
+0000100A  21C0 3000                 14      MOVE.L  D0, $3000   ; moves the value stored in D0 into memory location 3000
+0000100E  21C1 3010                 15      MOVE.L  D1, $3010   ; moves whats in D1 into 3010
+00001012  21C2 3020                 16      MOVE.L  D2, $3020   ; moves whats in D2 into 3030
 00001016                            17  
 00001016  FFFF FFFF                 18      SIMHALT             ; halt simulator
 0000101A                            19  
