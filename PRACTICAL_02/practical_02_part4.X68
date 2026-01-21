@@ -29,7 +29,7 @@ START:                  ; first instruction of program
     
     MOVE.B  D2, $3060   ; moves 8 bits from D2 to 3060
     MOVE.W  D3, A0  ; moves 16 bits from D3 to A0
-    MOVE.L  A0, D4  moves 32 bits from A0 to D4
+    MOVE.L  A0, D4  ; moves 32 bits from A0 to D4
 
     SIMHALT             ; halt simulator
 
@@ -42,3 +42,4 @@ START:                  ; first instruction of program
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
