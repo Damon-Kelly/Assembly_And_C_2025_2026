@@ -1,0 +1,67 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 26/01/2026 15:48:48
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : practical_03_part4
+00000000                             3  * Written by : Damon Kelly
+00000000                             4  * Date       : 26/01/2026
+00000000                             5  * Description: Use address registers
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8  START:                  ; first instruction of program
+00001000                             9  
+00001000  47F9 00001038             10      LEA HEALTH, A3   ; loads HEALTH variable into A3    
+00001006  0413 000A                 11      SUB.B   #10, (A3)   ; subtracts 10 from the first byte in the variable
+0000100A                            12      
+0000100A  49F9 00001039             13      LEA BOSSHEALTH, A4
+00001010  0414 0064                 14      SUB.B   #100, (A4)
+00001014                            15      
+00001014  43F9 0000103C             16      LEA PLAYERX,    A1
+0000101A  5251                      17      ADD.W   #1, (A1)
+0000101C                            18      
+0000101C  45F9 0000103D             19      LEA PLAYERY,    A2
+00001022                            20      
+00001022  4BF9 0000103A             21      LEA BOSSX,  A5
+00001028                            22      
+00001028  4DF9 0000103B             23      LEA BOSSY,  A6
+0000102E                            24      
+0000102E  4FF9 0000103E             25      LEA COINS,  A7
+00001034                            26      
+00001034  FFFF FFFF                 27      SIMHALT             ; halt simulator
+00001038                            28  
+00001038= 64                        29  HEALTH  dc.b $64
+00001039= FF                        30  BOSSHEALTH  dc.b    $FF
+0000103A= 00                        31  BOSSX   dc.b    $0
+0000103B= 00                        32  BOSSY   dc.b    $0
+0000103C= 00                        33  PLAYERX dc.b    $0
+0000103D= 00                        34  PLAYERY dc.b    $0
+0000103E= 00                        35  COINS  dc.b $0
+0000103F= A6                        36  BOSSCOINS  dc.b    $A6
+00001040= 0A                        37  BOSSDAMAGE  dc.b    $A
+00001041= 04                        38  PLAYERDAMAGE    dc.b    $4
+00001042= 00                        39  PLAYERPOINTS    dc.b    $0
+00001043= 01                        40  BOSSCYCLE   dc.b    $1
+00001044                            41  
+00001044                            42      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+BOSSCOINS           103F
+BOSSCYCLE           1043
+BOSSDAMAGE          1040
+BOSSHEALTH          1039
+BOSSX               103A
+BOSSY               103B
+COINS               103E
+HEALTH              1038
+PLAYERDAMAGE        1041
+PLAYERPOINTS        1042
+PLAYERX             103C
+PLAYERY             103D
+START               1000
