@@ -19,7 +19,7 @@ START:                  ; first instruction of program
     LEA PLAYERY,    A2  ; loads playery into A2
     LEA BOSSX,  A5  ; loads bossx into A5
     LEA BOSSY,  A6  ; loads bossy into A6
-    LEA COINS,  A7  ; loads coins into A7
+    LEA COINS,  A6  ; loads coins into A7 overriding bossy
     LEA BOSSCOINS,  A0  ; loads bosscoins into A0
     LEA BOSSDAMAGE, A1  ; loads bossdamage into A1 overriding the playerx that was there
     LEA PLAYERDAMAGE,   A2  ; loads bossdamage into A2 overriding playery
@@ -49,3 +49,4 @@ BOSSCYCLE   dc.b    $1
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
