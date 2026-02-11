@@ -48,6 +48,8 @@ UPDATE:
     CMP     #0, D1
     BLE     GAME_OVER
     ADD.L   #1, (A2)
+    CMP     POWER_UPS, (A2)
+    BEQ     
     BSR     COLLISION
     RTS
     
@@ -85,6 +87,10 @@ REDUCE_HEALTH:
     BSR     DRAW
     
     BRA     GAME_LOOP
+    
+GAIN_HEALTH:
+    ADD.B   #10, PLAYER_HEALTH
+    BRA     GAME_LOOP
 
 GAME_OVER:
     LEA     MSG_GAMEOVER, A1
@@ -113,7 +119,8 @@ MSG_COLLISION   DC.B    'Collision : ',0
 MSG_GAMEOVER    DC.B    'Game over : ',0
 MSG_DAMAGE      DC.B    'Taking Damage : ',0
 CRLF            DC.B    $0D,$0A,0
-ENEMY_POSITIONS DC.L    20, 30, 40, 50, 60, 70, 80, 90, 200, 300, 500, 0
+ENEMY_POSITIONS DC.L    20, 30, 40, 50, 60, 70, 80, 90, 200, 300, 500,0 ;
+POWER_UPS       DC.L    10, 55, 220,0 ; 
 
     END    START        ; last line of source
 
