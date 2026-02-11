@@ -19,7 +19,7 @@ COLLISION_CHECK:
     BEQ COLLISION
     
 NEXT_MOVE:
-    ADD.B   #1, D2
+    ADD.B   #10, D1
     BRA COLLISION_CHECK
     
 COLLISION:
@@ -32,6 +32,7 @@ PLAYER_POSITION: DC.B 10, 15
 ENEMY_POSITION: DC.B 50, 55
 
     END    START        ; last line of source
+
 
 
 *~Font name~Courier New~

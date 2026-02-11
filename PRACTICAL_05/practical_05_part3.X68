@@ -5,8 +5,15 @@
 * Description: Simple Game
 *-----------------------------------------------------------
     ORG    $1000
+DAMAGE EQU 100
 START:                  ; first instruction of program
 
+    LEA PLAYER_POSITION, A2
+    LEA ENEMY_POSITION, A3
+    
+    MOVE.B  (A2), D1
+    MOVE.B  (A3), D2
+    
 GAME_LOOP:
     LEA MSG_GAME_LOOP, A1
     MOVE.B  #13, D0
@@ -17,10 +24,9 @@ GAME_LOOP:
     BSR COLLISION_CHECK
     BRA GAME_LOOP
 UPDATE:
-    ADD.B   #1, PLAYER_POSITION
+    ADD.B   #10, D1
     RTS
 COLLISION_CHECK:
-    MOVE.B  PLAYER_POSITION, D1
     CMP.B   D2, D1
     BEQ     COLLISION
     RTS
@@ -41,6 +47,8 @@ MSG_GAME_LOOP   DC.B    'Game Loop........',0
 MSG_GAME_OVER   DC.B    'Game Over!',0
 
     END    START        ; last line of source
+
+
 
 
 *~Font name~Courier New~
