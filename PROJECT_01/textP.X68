@@ -9,6 +9,7 @@
 *              crew hits 0.
 * Known Bugs : If enter is hit when no number is entered it
 *              will break.
+*              After a bank heist heat randomly went to zero.
 *-----------------------------------------------------------
         ORG     $1000                       ; Set program start address to $1000
 
@@ -443,6 +444,7 @@ HEIST_WIN:
     LEA     SUCCESS_MSG,    A1              ; Load address of success message into A1
     MOVE.B  #14,            D0              ; Set trap task 14 to print string
     TRAP    #15                             ; Print the success message
+    BSR     NEW_LINE                        ; Print a blank line
 
     MOVE.W  CASH,           D1              ; Load current cash into D1
     ADD.W   HEIST_REWARD,   D1              ; Add the heist reward to cash
@@ -459,6 +461,7 @@ HEIST_WIN:
     LEA     HEAT_BONUS_MSG, A1              ; Load address of cycle heat warning into A1
     MOVE.B  #14,            D0              ; Set trap task 14 to print string
     TRAP    #15                             ; Print the cycle heat warning
+    BSR     WAIT_KEY                        ; Wait for user to press enter
     BSR     NEW_LINE                        ; Move to next line
 SKIP_BONUS_MSG:
 
@@ -538,6 +541,11 @@ BUST_PRINT:
     MOVE.B  #14,            D0              ; Set trap task 14 to print string
     TRAP    #15                             ; Print the crew lost message
     BSR     NEW_LINE                        ; Move to next line
+    
+    LEA     NOW_WANTED_MSG, A1              ; Load the message telling user that they are now wanted
+    MOVE.B  #14,            D0              ; Set teap task 14 to print string
+    TRAP    #15                             ; Print the now wanted message
+    
     BSR     WAIT_KEY                        ; Wait for player to read result before continuing
     RTS                                     ; Return after fail logic done
 
@@ -703,6 +711,7 @@ LAY_LOW:
     LEA     LAYLOW_MSG,     A1              ; Load address of lay low message into A1
     MOVE.B  #14,            D0              ; Set trap task 14 to print string
     TRAP    #15                             ; Print the lay low confirmation
+    BSR     WAIT_KEY                        ; Wait for user input
     BSR     NEW_LINE                        ; Move to next line
     RTS                                     ; Return after lay low handled
 
@@ -727,7 +736,7 @@ NO_CASH:
 *-----------------------------------------------------------
 * Subroutine : ROLL_DICE
 * Description: Returns a pseudo-random number 1-100 in D1
-*              Uses the system random number trap (task 8)
+*              Uses the system random number trap 
 *-----------------------------------------------------------
 ROLL_DICE:
     MOVE.B  #8,             D0              ; Set trap task 8 to get a random number
@@ -804,7 +813,7 @@ MENU_MSG        DC.B    '--- YOUR NEXT MOVE ---',$0D,$0A
                 DC.B    '  YOUR NEXT MOVE',$0D,$0A
                 DC.B    '  1. PLAN A HEIST',$0D,$0A
                 DC.B    $0D,$0A
-                DC.B    '  SPEND CASH',$0D,$0A
+                DC.B    '  SPEND MONEY',$0D,$0A
                 DC.B    '  2. UPGRADE GEAR    $100',$0D,$0A
                 DC.B    '  3. HIRE CREW       $150',$0D,$0A
                 DC.B    '  4. BRIBE POLICE    $200  (-20 HEAT)',$0D,$0A
@@ -820,14 +829,15 @@ HEIST_MENU_MSG  DC.B    '--- CHOOSE YOUR TARGET ---',$0D,$0A
                 DC.B    '1. CORNER SHOP     LOW RISK  REWARD $200  HEAT +15  GEAR 1+',$0D,$0A
                 DC.B    '2. JEWELLERY STORE MED RISK  REWARD $350  HEAT +30  GEAR 2+',$0D,$0A
                 DC.B    '3. BANK VAULT      HIGH RISK REWARD $700  HEAT +50  GEAR 4+',$0D,$0A
+                DC.B    $0D,$0A
                 DC.B    'LOAD GUIDE: UNDER 150=LIGHT  150-299=MODERATE  300+=HEAVY',$0D,$0A
+                DC.B    $0D,$0A
                 DC.B    'ENTER CHOICE: ',0
 
 HUD_HEADER      DC.B    '=== YOUR STATUS ===',0
 HUD_MONEY       DC.B    '  MONEY',0                 
 HUD_CREW        DC.B    '  YOUR CREW',0             
 HUD_HEAT        DC.B    '  HEAT',0                 
-
 CASH_MSG        DC.B    'CASH  : $',0
 CREW_MSG        DC.B    'CREW  :  ',0                  
 GEAR_MSG        DC.B    'GEAR  :  ',0
@@ -835,24 +845,39 @@ HEAT_MSG        DC.B    'HEAT  :  ',0
 REP_MSG         DC.B    'REP   :  ',0
 DIVIDER         DC.B    '======================',0
 
-SHOP_MSG        DC.B    'TARGET: CORNER SHOP. STAY CALM AND MOVE FAST.',0
-JEWEL_MSG       DC.B    'TARGET: JEWELLERY STORE. LASERS AND GUARDS.',0
-BANK_MSG        DC.B    'TARGET: BANK VAULT. THE BIG ONE. NO MISTAKES.',0
+SHOP_MSG        DC.B    $0D,$0A        
+                DC.B    'TARGET: CORNER SHOP. STAY CALM AND MOVE FAST.'
+                DC.B    $0D,$0A ,0
+JEWEL_MSG       DC.B    $0D,$0A 
+                DC.B    'TARGET: JEWELLERY STORE. LASERS AND GUARDS.'
+                DC.B    $0D,$0A ,0
+BANK_MSG        DC.B    $0D,$0A 
+                DC.B    'TARGET: BANK VAULT. THE BIG ONE. NO MISTAKES!'
+                DC.B    $0D,$0A ,0
 
 WANTED_MSG      DC.B    'WANTED:  ',0
 CYCLE_MSG       DC.B    'CYCLE :  ',0
 CYCLE_UP_MSG    DC.B    'CYCLE COMPLETE! HEAT INCREASING NEXT CYCLE.',0
-HEAT_BONUS_MSG  DC.B    'CYCLE HEAT BONUS APPLIED - COPS ARE GETTING SMARTER.',0
-LAYLOW_MSG      DC.B    'YOU GO DARK. HEAT GONE, TWO CREW LEFT BEHIND.',0
+HEAT_BONUS_MSG  DC.B    'CYCLE HEAT BONUS APPLIED - POLICE ARE CATCHING ON.'
+                DC.B    $0D,$0A ,0
+LAYLOW_MSG      DC.B    'YOU GO DARK. HEAT GONE, TWO CREW MEMBERS LEAVE.'
+                DC.B    $0D,$0A ,0
 LAYLOW_FAIL_MSG DC.B    'CANNOT LAY LOW WITHOUT AT LEAST 3 CREW MEMBERS.',0
 LOAD_MSG        DC.B    'LOAD  :  ',0 
+NOW_WANTED_MSG  DC.B    'YOU ARE NOW WANTED! HEAT +15 NEXT HEIST.'
+                DC.B    $0D,$0A ,0
 
-EXECUTING_MSG   DC.B    'EXECUTING HEIST...',0
-SUCCESS_MSG     DC.B    'SUCCESS! CLEAN GETAWAY!',0
-FAIL_MSG        DC.B    'BUSTED! YOU BARELY ESCAPED!',0
-LOW_GEAR_MSG    DC.B    'YOUR GEAR IS NOT GOOD ENOUGH FOR THIS TARGET!',0
+EXECUTING_MSG   DC.B    'EXECUTING HEIST...'
+                DC.B    $0D,$0A ,0
+SUCCESS_MSG     DC.B    'SUCCESS! CLEAN GETAWAY!'
+                DC.B    $0D,$0A ,0
+FAIL_MSG        DC.B    'BUSTED! YOU BARELY ESCAPED!'
+                DC.B    $0D,$0A ,0
+LOW_GEAR_MSG    DC.B    'YOUR GEAR IS NOT GOOD ENOUGH FOR THIS TARGET!'
+                DC.B    $0D,$0A ,0
 REWARD_MSG      DC.B    'CASH EARNED: $',0
-CREW_LOST_MSG   DC.B    'YOU LOST A CREW MEMBER IN THE CHAOS.',0
+CREW_LOST_MSG   DC.B    'YOU LOST A CREW MEMBER IN THE CHAOS.'
+                DC.B    $0D,$0A ,0
 
 EVENT_ALARM_MSG  DC.B   'EVENT: SILENT ALARM TRIGGERED! HEAT +10',0
 EVENT_INSIDE_MSG DC.B   'EVENT: INSIDE MAN TIPS YOU OFF! BONUS $100',0
@@ -897,6 +922,7 @@ CYCLE           DS.W    1       ; Current endless mode cycle number
 HEAT_BONUS      DS.W    1       ; Extra heat added per heist each cycle
 
         END     START           ; Mark end of program, begin execution at START
+
 
 *~Font name~Courier New~
 *~Font size~10~
