@@ -1,6 +1,6 @@
 #include "stdio.h" // standard IO header file
 
-void main()
+int main()
 {
     int a = 10;
     int b = 20;
@@ -25,4 +25,6 @@ void main()
 
     // Call to printf function my_char_ptr is substituted for %c
     printf("Value in memory for first char of my_char_ptr is %c\n", *my_char_ptr);
+
+    return 0;
 }

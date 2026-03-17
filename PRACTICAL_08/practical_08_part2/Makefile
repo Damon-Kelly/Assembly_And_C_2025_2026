@@ -4,12 +4,12 @@ MSG_START   := "Build Started"
 MSG_END     := "Build Complete"
 MSG_CLEAN   := "Cleaning up"
 
-BUILD_DIR   := ./bin
-SRC_DIR     := ./src
+BUILD_DIR   := .
+SRC_DIR     := .
 
 TARGET      := ${BUILD_DIR}/sampleapp.bin
 
-SRC         := ${SRC_DIR}/introduction/lesson_01/main.c
+SRC         := ${SRC_DIR}/main.c
 
 all         := build
 
