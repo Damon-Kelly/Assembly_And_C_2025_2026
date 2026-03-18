@@ -1,0 +1,24 @@
+CXX         := gcc
+
+MSG_START   := "Build Started"
+MSG_END     := "Build Complete"
+MSG_CLEAN   := "Cleaning up"
+
+BUILD_DIR   := .
+SRC_DIR     := .
+
+TARGET      := ${BUILD_DIR}/sampleapp.bin
+
+SRC         := ${SRC_DIR}/main.c
+
+all         := build
+
+build:
+	@echo	${MSG_START}
+	${CXX}	-o	${TARGET}	${SRC}	-I.
+	@echo	${MSG_END}
+	./${TARGET}
+
+clean:
+	@echo	${MSG_CLEAN}
+	rm ${TARGET}
