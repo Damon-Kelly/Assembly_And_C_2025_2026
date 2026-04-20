@@ -1,0 +1,96 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 20/4/2026 10:37:30
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00000000                             7      
+00001000                             8  START   ORG    $1000
+00001000                             9  
+00001000  4283                      10      CLR.L   D3
+00001002  383C 0003                 11      MOVE.W  #3, D4
+00001006                            12      
+00001006                            13  GAME_LOOP:
+00001006                            14      * Input two numbers and add them using REGISTER_ADDER subroutine
+00001006  103C 000E                 15      MOVE.B  #14, D0     ; Task 14: Display string
+0000100A  43F9 00001076             16      LEA     PROMPT, A1  ; Load address of prompt string
+00001010  4E4F                      17      TRAP    #15         ; System call (No input validation)
+00001012                            18      
+00001012  103C 0004                 19      MOVE.B  #4, D0      ; Task 4: read int input (No input validation)
+00001016  4E4F                      20      TRAP    #15
+00001018  2401                      21      MOVE.L  D1, D2
+0000101A                            22      
+0000101A  103C 000E                 23      MOVE.B  #14, D0
+0000101E  43F9 00001076             24      LEA     PROMPT, A1
+00001024  4E4F                      25      TRAP    #15         ; Display prompt (No validation)
+00001026                            26      
+00001026  103C 0004                 27      MOVE.B  #4, D0
+0000102A  4E4F                      28      TRAP    #15
+0000102C                            29      
+0000102C  6100 0036                 30      BSR     REGISTER_ADDER
+00001030  D681                      31      ADD.L   D1, D3
+00001032                            32      
+00001032  103C 000E                 33      MOVE.B  #14, D0
+00001036  43F9 00001085             34      LEA     RESULT, A1
+0000103C  4E4F                      35      TRAP    #15
+0000103E  103C 0003                 36      MOVE.B  #3, D0
+00001042  4E4F                      37      TRAP    #15
+00001044                            38      
+00001044  6100 0022                 39      BSR     NEW_LINE
+00001048                            40      
+00001048                            41      * Decrement loop counter and repeat if not zero
+00001048  5344                      42      SUBQ.W  #1, D4
+0000104A  66BA                      43      BNE     GAME_LOOP
+0000104C                            44      
+0000104C                            45      * Display final sum
+0000104C  103C 000E                 46      MOVE.B  #14, D0
+00001050  43F9 00001092             47      LEA     FINAL_RESULT, A1
+00001056  4E4F                      48      TRAP    #15
+00001058  2203                      49      MOVE.L  D3, D1
+0000105A  103C 0003                 50      MOVE.B  #3, D0
+0000105E  4E4F                      51      TRAP    #15
+00001060                            52      
+00001060  FFFF FFFF                 53      SIMHALT             ; halt simulator
+00001064                            54  
+00001064                            55  *---------------------------------------
+00001064                            56  * Add numbers using register parameters
+00001064                            57  REGISTER_ADDER:
+00001064  D282                      58      ADD.L   D2, D1      ; Add D2 to D1 (No bounds checking)
+00001066  4E75                      59      RTS
+00001068                            60  
+00001068                            61  *---------------------------------------
+00001068                            62  * Subroutine to display Carriage Return and Line Feed
+00001068                            63  NEW_LINE:
+00001068  103C 000E                 64      MOVE.B  #14, D0
+0000106C  43F9 000010A1             65      LEA     CRLF, A1
+00001072  4E4F                      66      TRAP    #15
+00001074  4E75                      67      RTS
+00001076                            68      
+00001076                            69  *---------------------------------------
+00001076                            70  * Strings
+00001076= 45 6E 74 65 72 20 ...     71  PROMPT  DC.B    'Enter number: ',0
+00001085= 54 68 65 20 73 75 ...     72  RESULT  DC.B    'The sum is: ',0
+00001092= 46 69 6E 61 6C 20 ...     73  FINAL_RESULT  DC.B    'Final sum is: ',0
+000010A1= 0D 0A 00                  74  CRLF  DC.B    $D,$A,0
+000010A4                            75  
+000010A4                            76      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CRLF                10A1
+FINAL_RESULT        1092
+GAME_LOOP           1006
+NEW_LINE            1068
+PROMPT              1076
+REGISTER_ADDER      1064
+RESULT              1085
+START               1000
