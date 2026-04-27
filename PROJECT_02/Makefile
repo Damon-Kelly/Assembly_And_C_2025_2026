@@ -1,11 +1,17 @@
-EXECUTABLE=IntegratingCandASM
+AS=nasm
+LD=ld
+ASFLAGS=-f elf64 -g -F dwarf -l main.lst
+TARGET=main
+SOURCES=main.asm
+OBJECTS=$(SOURCES:.asm=.o)
 
-all:
-	nasm -f elf main.asm -o main.o -l starter.lst
-	gcc -m32 -c main.c
-	gcc -m32 main.o -o $(EXECUTABLE)
-	./$(EXECUTABLE)s
+all: $(TARGET)
 
-#Clean folder
+$(TARGET): $(OBJECTS)
+	$(LD) $(OBJECTS) -o $@
+
+%.o: %.asm
+	$(AS) $(ASFLAGS) $< -o $@
+
 clean:
-	rm -rf *o *.lst $(EXECUTABLE)
+	rm -f $(OBJECTS) $(TARGET) *.lst

@@ -1,0 +1,165 @@
+     1                                  global _start
+     2                                  
+     3                                  section .data
+     4 00000000 456E746572206E756D-         prompt db "Enter number: ", 0
+     4 00000009 6265723A2000       
+     5                                      prompt_len equ $-prompt
+     6                                  
+     7 0000000F 53756D3A2000                result_label db "Sum: ", 0
+     8                                      result_label_len equ $-result_label
+     9                                  
+    10 00000015 0A                          newline db 10
+    11                                  
+    12                                  section .bss
+    13 00000000 <res 10h>                   first_input_buffer  resb 16
+    14 00000010 <res 10h>                   second_input_buffer resb 16
+    15 00000020 <res 10h>                   output_buffer       resb 16
+    16                                  
+    17                                  section .text
+    18                                  
+    19                                  _start:
+    20                                      ; --- Get First Number ---
+    21 00000000 48BE-                       mov rsi, prompt
+    21 00000002 [0000000000000000] 
+    22 0000000A BA0F000000                  mov rdx, prompt_len
+    23 0000000F E8AB000000                  call print_string
+    24                                  
+    25 00000014 48BE-                       mov rsi, first_input_buffer
+    25 00000016 [0000000000000000] 
+    26 0000001E BA10000000                  mov rdx, 16
+    27 00000023 E8A4000000                  call read_input
+    28                                  
+    29 00000028 48BE-                       mov rsi, first_input_buffer
+    29 0000002A [0000000000000000] 
+    30 00000032 E8A2000000                  call string_to_integer
+    31                                  
+    32 00000037 4989C4                      mov r12, rax      ; store first number
+    33                                  
+    34                                      ; --- Get Second Number ---
+    35 0000003A 48BE-                       mov rsi, prompt
+    35 0000003C [0000000000000000] 
+    36 00000044 BA0F000000                  mov rdx, prompt_len
+    37 00000049 E871000000                  call print_string
+    38                                  
+    39 0000004E 48BE-                       mov rsi, second_input_buffer
+    39 00000050 [1000000000000000] 
+    40 00000058 BA10000000                  mov rdx, 16
+    41 0000005D E86A000000                  call read_input
+    42                                  
+    43 00000062 48BE-                       mov rsi, second_input_buffer
+    43 00000064 [1000000000000000] 
+    44 0000006C E868000000                  call string_to_integer
+    45                                  
+    46                                      ; --- Add Numbers ---
+    47 00000071 4C01E0                      add rax, r12      ; rax = second + first
+    48                                  
+    49                                      ; --- Print Result Label ---
+    50 00000074 50                          push rax
+    51 00000075 48BE-                       mov rsi, result_label
+    51 00000077 [0F00000000000000] 
+    52 0000007F BA06000000                  mov rdx, result_label_len
+    53 00000084 E836000000                  call print_string
+    54 00000089 58                          pop rax
+    55                                  
+    56                                      ; --- Convert Result to String ---
+    57 0000008A 48BF-                       mov rdi, output_buffer
+    57 0000008C [2000000000000000] 
+    58 00000094 E868000000                  call integer_to_string   ; clearer than itoa
+    59                                  
+    60                                      ; --- Print Result ---
+    61 00000099 4889C6                      mov rsi, rax
+    62 0000009C E81E000000                  call print_string
+    63                                  
+    64                                      ; --- Newline ---
+    65 000000A1 48BE-                       mov rsi, newline
+    65 000000A3 [1500000000000000] 
+    66 000000AB BA01000000                  mov rdx, 1
+    67 000000B0 E80A000000                  call print_string
+    68                                  
+    69                                      ; --- Exit ---
+    70 000000B5 B83C000000                  mov rax, 60
+    71 000000BA 4831FF                      xor rdi, rdi
+    72 000000BD 0F05                        syscall
+    73                                  
+    74                                  ; -------------------------
+    75                                  ; print_string
+    76                                  ; rsi = pointer to text
+    77                                  ; rdx = length
+    78                                  ; -------------------------
+    79                                  print_string:
+    80 000000BF B801000000                  mov rax, 1        ; syscall: write
+    81 000000C4 BF01000000                  mov rdi, 1        ; stdout
+    82 000000C9 0F05                        syscall
+    83 000000CB C3                          ret
+    84                                  
+    85                                  ; -------------------------
+    86                                  ; read_input
+    87                                  ; rsi = buffer
+    88                                  ; rdx = max length
+    89                                  ; -------------------------
+    90                                  read_input:
+    91 000000CC B800000000                  mov rax, 0        ; syscall: read
+    92 000000D1 BF00000000                  mov rdi, 0        ; stdin
+    93 000000D6 0F05                        syscall
+    94 000000D8 C3                          ret
+    95                                  
+    96                                  ; -------------------------
+    97                                  ; string_to_integer
+    98                                  ; converts ASCII digits to integer
+    99                                  ; rsi = input string
+   100                                  ; returns rax = integer
+   101                                  ; -------------------------
+   102                                  string_to_integer:
+   103 000000D9 4831C0                      xor rax, rax
+   104 000000DC 4831C9                      xor rcx, rcx
+   105                                  
+   106                                  .next_char:
+   107 000000DF 4C0FB6040E                  movzx r8, byte [rsi+rcx]
+   108 000000E4 4180F80A                    cmp r8b, 10      ; newline
+   109 000000E8 7416                        je .done
+   110 000000EA 4180F800                    cmp r8b, 0       ; null terminator
+   111 000000EE 7410                        je .done
+   112                                  
+   113 000000F0 4180E830                    sub r8b, '0'     ; ASCII -> number
+   114 000000F4 486BC00A                    imul rax, 10
+   115 000000F8 4C01C0                      add rax, r8
+   116                                  
+   117 000000FB 48FFC1                      inc rcx
+   118 000000FE EBDF                        jmp .next_char
+   119                                  
+   120                                  .done:
+   121 00000100 C3                          ret
+   122                                  
+   123                                  ; -------------------------
+   124                                  ; integer_to_string
+   125                                  ; converts integer to ASCII string
+   126                                  ; rax = number
+   127                                  ; rdi = output buffer
+   128                                  ; returns:
+   129                                  ;   rax = pointer to string
+   130                                  ;   rdx = length
+   131                                  ; -------------------------
+   132                                  integer_to_string:
+   133 00000101 B900000000                  mov rcx, 0
+   134 00000106 BB0A000000                  mov rbx, 10
+   135                                  
+   136                                  .extract_digits:
+   137 0000010B 4831D2                      xor rdx, rdx
+   138 0000010E 48F7F3                      div rbx
+   139 00000111 80C230                      add dl, '0'
+   140 00000114 52                          push rdx
+   141 00000115 48FFC1                      inc rcx
+   142 00000118 4885C0                      test rax, rax
+   143 0000011B 75EE                        jnz .extract_digits
+   144                                  
+   145 0000011D 4889F8                      mov rax, rdi
+   146 00000120 4989C8                      mov r8, rcx
+   147                                  
+   148                                  .write_digits:
+   149 00000123 5A                          pop rdx
+   150 00000124 8817                        mov [rdi], dl
+   151 00000126 48FFC7                      inc rdi
+   152 00000129 E2F8                        loop .write_digits
+   153                                  
+   154 0000012B 4C89C2                      mov rdx, r8
+   155 0000012E C3                          ret
