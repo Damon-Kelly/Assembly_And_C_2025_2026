@@ -1,4 +1,6 @@
 global run_sum
+global register_adder
+global string_to_integer
 
 section .data
     prompt           db "Enter number: "
