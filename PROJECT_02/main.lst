@@ -1,165 +1,257 @@
-     1                                  global _start
-     2                                  
-     3                                  section .data
-     4 00000000 456E746572206E756D-         prompt db "Enter number: ", 0
-     4 00000009 6265723A2000       
-     5                                      prompt_len equ $-prompt
-     6                                  
-     7 0000000F 53756D3A2000                result_label db "Sum: ", 0
-     8                                      result_label_len equ $-result_label
-     9                                  
-    10 00000015 0A                          newline db 10
-    11                                  
-    12                                  section .bss
-    13 00000000 <res 10h>                   first_input_buffer  resb 16
-    14 00000010 <res 10h>                   second_input_buffer resb 16
-    15 00000020 <res 10h>                   output_buffer       resb 16
-    16                                  
-    17                                  section .text
-    18                                  
-    19                                  _start:
-    20                                      ; --- Get First Number ---
-    21 00000000 48BE-                       mov rsi, prompt
-    21 00000002 [0000000000000000] 
-    22 0000000A BA0F000000                  mov rdx, prompt_len
-    23 0000000F E8AB000000                  call print_string
-    24                                  
-    25 00000014 48BE-                       mov rsi, first_input_buffer
-    25 00000016 [0000000000000000] 
-    26 0000001E BA10000000                  mov rdx, 16
-    27 00000023 E8A4000000                  call read_input
-    28                                  
-    29 00000028 48BE-                       mov rsi, first_input_buffer
-    29 0000002A [0000000000000000] 
-    30 00000032 E8A2000000                  call string_to_integer
-    31                                  
-    32 00000037 4989C4                      mov r12, rax      ; store first number
-    33                                  
-    34                                      ; --- Get Second Number ---
-    35 0000003A 48BE-                       mov rsi, prompt
-    35 0000003C [0000000000000000] 
-    36 00000044 BA0F000000                  mov rdx, prompt_len
-    37 00000049 E871000000                  call print_string
-    38                                  
-    39 0000004E 48BE-                       mov rsi, second_input_buffer
-    39 00000050 [1000000000000000] 
-    40 00000058 BA10000000                  mov rdx, 16
-    41 0000005D E86A000000                  call read_input
-    42                                  
-    43 00000062 48BE-                       mov rsi, second_input_buffer
-    43 00000064 [1000000000000000] 
-    44 0000006C E868000000                  call string_to_integer
-    45                                  
-    46                                      ; --- Add Numbers ---
-    47 00000071 4C01E0                      add rax, r12      ; rax = second + first
-    48                                  
-    49                                      ; --- Print Result Label ---
-    50 00000074 50                          push rax
-    51 00000075 48BE-                       mov rsi, result_label
-    51 00000077 [0F00000000000000] 
-    52 0000007F BA06000000                  mov rdx, result_label_len
-    53 00000084 E836000000                  call print_string
-    54 00000089 58                          pop rax
-    55                                  
-    56                                      ; --- Convert Result to String ---
-    57 0000008A 48BF-                       mov rdi, output_buffer
-    57 0000008C [2000000000000000] 
-    58 00000094 E868000000                  call integer_to_string   ; clearer than itoa
-    59                                  
-    60                                      ; --- Print Result ---
-    61 00000099 4889C6                      mov rsi, rax
-    62 0000009C E81E000000                  call print_string
-    63                                  
-    64                                      ; --- Newline ---
-    65 000000A1 48BE-                       mov rsi, newline
-    65 000000A3 [1500000000000000] 
-    66 000000AB BA01000000                  mov rdx, 1
-    67 000000B0 E80A000000                  call print_string
-    68                                  
-    69                                      ; --- Exit ---
-    70 000000B5 B83C000000                  mov rax, 60
-    71 000000BA 4831FF                      xor rdi, rdi
-    72 000000BD 0F05                        syscall
-    73                                  
-    74                                  ; -------------------------
-    75                                  ; print_string
-    76                                  ; rsi = pointer to text
-    77                                  ; rdx = length
-    78                                  ; -------------------------
-    79                                  print_string:
-    80 000000BF B801000000                  mov rax, 1        ; syscall: write
-    81 000000C4 BF01000000                  mov rdi, 1        ; stdout
-    82 000000C9 0F05                        syscall
-    83 000000CB C3                          ret
-    84                                  
-    85                                  ; -------------------------
-    86                                  ; read_input
-    87                                  ; rsi = buffer
-    88                                  ; rdx = max length
-    89                                  ; -------------------------
-    90                                  read_input:
-    91 000000CC B800000000                  mov rax, 0        ; syscall: read
-    92 000000D1 BF00000000                  mov rdi, 0        ; stdin
-    93 000000D6 0F05                        syscall
-    94 000000D8 C3                          ret
-    95                                  
-    96                                  ; -------------------------
-    97                                  ; string_to_integer
-    98                                  ; converts ASCII digits to integer
-    99                                  ; rsi = input string
-   100                                  ; returns rax = integer
-   101                                  ; -------------------------
-   102                                  string_to_integer:
-   103 000000D9 4831C0                      xor rax, rax
-   104 000000DC 4831C9                      xor rcx, rcx
-   105                                  
-   106                                  .next_char:
-   107 000000DF 4C0FB6040E                  movzx r8, byte [rsi+rcx]
-   108 000000E4 4180F80A                    cmp r8b, 10      ; newline
-   109 000000E8 7416                        je .done
-   110 000000EA 4180F800                    cmp r8b, 0       ; null terminator
-   111 000000EE 7410                        je .done
-   112                                  
-   113 000000F0 4180E830                    sub r8b, '0'     ; ASCII -> number
-   114 000000F4 486BC00A                    imul rax, 10
-   115 000000F8 4C01C0                      add rax, r8
-   116                                  
-   117 000000FB 48FFC1                      inc rcx
-   118 000000FE EBDF                        jmp .next_char
-   119                                  
-   120                                  .done:
-   121 00000100 C3                          ret
+     1                                  global run_sum
+     2                                  global register_adder
+     3                                  global string_to_integer
+     4                                  
+     5                                  section .data
+     6 00000000 456E746572206E756D-         prompt           db "Enter number: "
+     6 00000009 6265723A20         
+     7                                      prompt_len       equ $-prompt
+     8 0000000E 5468652073756D2069-         result_label     db "The sum is: "
+     8 00000017 733A20             
+     9                                      result_label_len equ $-result_label
+    10 0000001A 46696E616C2073756D-         total_label      db "Final sum is: "
+    10 00000023 2069733A20         
+    11                                      total_label_len  equ $-total_label
+    12 00000028 0A                          newline          db 10
+    13                                  
+    14                                  section .bss
+    15 00000000 <res 10h>                   input_buffer     resb 16
+    16 00000010 <res 20h>                   output_buffer    resb 32
+    17                                  
+    18                                  section .text
+    19                                  
+    20                                  run_sum:
+    21 00000000 53                          push    rbx
+    22 00000001 4155                        push    r13
+    23 00000003 4156                        push    r14
+    24 00000005 4157                        push    r15
+    25 00000007 4883EC08                    sub     rsp, 8                      ; keep stack 16-byte aligned for calls
+    26                                  
+    27 0000000B 4D31ED                      xor     r13, r13                    ; r13 = running sum = 0
+    28 0000000E 41BE03000000                mov     r14, 3                      ; r14 = loop counter = 3
+    29                                  
+    30                                  ; -------------------------------------------------------
+    31                                  ; INPUT LOOP — 3 iterations
+    32                                  ; -------------------------------------------------------
+    33                                  .loop_start:
+    34 00000014 4983FE00                    cmp     r14, 0                      ; check whether all 3 iterations are done
+    35 00000018 0F84F2000000                je      .loop_done                  ; exit loop if finished
+    36                                  
+    37                                      ; --- Prompt for first number ---
+    38 0000001E 48BE-                       mov     rsi, prompt
+    38 00000020 [0000000000000000] 
+    39 00000028 BA0E000000                  mov     rdx, prompt_len
+    40 0000002D E830010000                  call    print_string
+    41                                  
+    42                                      ; --- Read first number and save byte count ---
+    43 00000032 48BE-                       mov     rsi, input_buffer
+    43 00000034 [0000000000000000] 
+    44 0000003C BA10000000                  mov     rdx, 16
+    45 00000041 E829010000                  call    read_input
+    46 00000046 4883F800                    cmp     rax, 0                      ; stop cleanly on EOF or read error
+    47 0000004A 0F8EC0000000                jle     .loop_done
+    48 00000050 4889C3                      mov     rbx, rax                    ; save byte count from read
+    49                                  
+    50                                      ; --- Convert first input to integer ---
+    51 00000053 48BE-                       mov     rsi, input_buffer
+    51 00000055 [0000000000000000] 
+    52 0000005D 4889DA                      mov     rdx, rbx                    ; limit scan to bytes actually read
+    53 00000060 E84F010000                  call    string_to_integer
+    54 00000065 4883F8FF                    cmp     rax, -1                     ; invalid input
+    55 00000069 74A9                        je      .loop_start                 ; re-prompt this iteration
+    56 0000006B 4989C7                      mov     r15, rax                    ; store first number
+    57                                  
+    58                                      ; --- Prompt for second number ---
+    59 0000006E 48BE-                       mov     rsi, prompt
+    59 00000070 [0000000000000000] 
+    60 00000078 BA0E000000                  mov     rdx, prompt_len
+    61 0000007D E8E0000000                  call    print_string
+    62                                  
+    63                                      ; --- Read second number and save byte count ---
+    64 00000082 48BE-                       mov     rsi, input_buffer
+    64 00000084 [0000000000000000] 
+    65 0000008C BA10000000                  mov     rdx, 16
+    66 00000091 E8D9000000                  call    read_input
+    67 00000096 4883F800                    cmp     rax, 0                      ; stop cleanly on EOF or read error
+    68 0000009A 7E74                        jle     .loop_done
+    69 0000009C 4889C3                      mov     rbx, rax                    ; save byte count from read
+    70                                  
+    71                                      ; --- Convert second input to integer ---
+    72 0000009F 48BE-                       mov     rsi, input_buffer
+    72 000000A1 [0000000000000000] 
+    73 000000A9 4889DA                      mov     rdx, rbx                    ; limit scan to bytes actually read
+    74 000000AC E803010000                  call    string_to_integer
+    75 000000B1 4883F8FF                    cmp     rax, -1                     ; invalid input
+    76 000000B5 0F8459FFFFFF                je      .loop_start                 ; re-prompt this iteration
+    77                                  
+    78                                      ; --- Add two numbers using register_adder ---
+    79                                      ; rax = second number, r15 = first number
+    80 000000BB E89E000000                  call    register_adder              ; rax = first + second
+    81 000000C0 4989C7                      mov     r15, rax                    ; save iteration sum
+    82                                  
+    83                                      ; --- Print iteration sum label ---
+    84 000000C3 48BE-                       mov     rsi, result_label
+    84 000000C5 [0E00000000000000] 
+    85 000000CD BA0C000000                  mov     rdx, result_label_len
+    86 000000D2 E88B000000                  call    print_string
+    87                                  
+    88                                      ; --- Print iteration sum ---
+    89 000000D7 4C89F8                      mov     rax, r15
+    90 000000DA 48BF-                       mov     rdi, output_buffer
+    90 000000DC [1000000000000000] 
+    91 000000E4 E80C010000                  call    integer_to_string
+    92 000000E9 4889C6                      mov     rsi, rax
+    93 000000EC E871000000                  call    print_string
+    94                                  
+    95                                      ; --- Newline ---
+    96 000000F1 48BE-                       mov     rsi, newline
+    96 000000F3 [2800000000000000] 
+    97 000000FB BA01000000                  mov     rdx, 1
+    98 00000100 E85D000000                  call    print_string
+    99                                  
+   100                                      ; --- Add iteration sum to running total ---
+   101 00000105 4D01FD                      add     r13, r15
+   102 00000108 49FFCE                      dec     r14
+   103 0000010B E904FFFFFF                  jmp     .loop_start
+   104                                  
+   105                                  ; -------------------------------------------------------
+   106                                  ; POST-LOOP — print final sum
+   107                                  ; -------------------------------------------------------
+   108                                  .loop_done:
+   109                                      ; --- Print final sum label ---
+   110 00000110 48BE-                       mov     rsi, total_label
+   110 00000112 [1A00000000000000] 
+   111 0000011A BA0E000000                  mov     rdx, total_label_len
+   112 0000011F E83E000000                  call    print_string
+   113                                  
+   114                                      ; --- Convert running sum to string ---
+   115 00000124 4C89E8                      mov     rax, r13
+   116 00000127 48BF-                       mov     rdi, output_buffer
+   116 00000129 [1000000000000000] 
+   117 00000131 E8BF000000                  call    integer_to_string
+   118                                  
+   119                                      ; --- Print final sum ---
+   120 00000136 4889C6                      mov     rsi, rax
+   121 00000139 E824000000                  call    print_string
    122                                  
-   123                                  ; -------------------------
-   124                                  ; integer_to_string
-   125                                  ; converts integer to ASCII string
-   126                                  ; rax = number
-   127                                  ; rdi = output buffer
-   128                                  ; returns:
-   129                                  ;   rax = pointer to string
-   130                                  ;   rdx = length
-   131                                  ; -------------------------
-   132                                  integer_to_string:
-   133 00000101 B900000000                  mov rcx, 0
-   134 00000106 BB0A000000                  mov rbx, 10
-   135                                  
-   136                                  .extract_digits:
-   137 0000010B 4831D2                      xor rdx, rdx
-   138 0000010E 48F7F3                      div rbx
-   139 00000111 80C230                      add dl, '0'
-   140 00000114 52                          push rdx
-   141 00000115 48FFC1                      inc rcx
-   142 00000118 4885C0                      test rax, rax
-   143 0000011B 75EE                        jnz .extract_digits
-   144                                  
-   145 0000011D 4889F8                      mov rax, rdi
-   146 00000120 4989C8                      mov r8, rcx
-   147                                  
-   148                                  .write_digits:
-   149 00000123 5A                          pop rdx
-   150 00000124 8817                        mov [rdi], dl
-   151 00000126 48FFC7                      inc rdi
-   152 00000129 E2F8                        loop .write_digits
-   153                                  
-   154 0000012B 4C89C2                      mov rdx, r8
-   155 0000012E C3                          ret
+   123                                      ; --- Newline ---
+   124 0000013E 48BE-                       mov     rsi, newline
+   124 00000140 [2800000000000000] 
+   125 00000148 BA01000000                  mov     rdx, 1
+   126 0000014D E810000000                  call    print_string
+   127                                  
+   128 00000152 4883C408                    add     rsp, 8                      ; undo alignment adjustment
+   129 00000156 415F                        pop     r15
+   130 00000158 415E                        pop     r14
+   131 0000015A 415D                        pop     r13
+   132 0000015C 5B                          pop     rbx
+   133 0000015D C3                          ret
+   134                                  
+   135                                  ; -------------------------------------------------------
+   136                                  ; register_adder | mirrors the 68000 REGISTER_ADDER subroutine
+   137                                  ; rax = second number, r15 = first number
+   138                                  ; returns: rax = sum
+   139                                  ; -------------------------------------------------------
+   140                                  register_adder:
+   141 0000015E 4C01F8                      add     rax, r15                    ; add first + second
+   142 00000161 C3                          ret
+   143                                  
+   144                                  ; -------------------------------------------------------
+   145                                  ; print_string | rsi = pointer, rdx = length
+   146                                  ; -------------------------------------------------------
+   147                                  print_string:
+   148 00000162 B801000000                  mov     rax, 1                      ; syscall: write
+   149 00000167 BF01000000                  mov     rdi, 1                      ; stdout
+   150 0000016C 0F05                        syscall
+   151 0000016E C3                          ret
+   152                                  
+   153                                  ; -------------------------------------------------------
+   154                                  ; read_input | rsi = buffer, rdx = max length
+   155                                  ; returns: rax = bytes stored (excess input is discarded)
+   156                                  ; -------------------------------------------------------
+   157                                  read_input:
+   158 0000016F 53                          push    rbx
+   159 00000170 4154                        push    r12
+   160 00000172 4155                        push    r13
+   161 00000174 4989F4                      mov     r12, rsi        ; save buffer base
+   162 00000177 4989D5                      mov     r13, rdx        ; save max length
+   163 0000017A 4831DB                      xor     rbx, rbx        ; byte count = 0
+   164                                  .read_char:
+   165 0000017D 498D341C                    lea     rsi, [r12 + rbx]
+   166 00000181 B800000000                  mov     rax, 0
+   167 00000186 BF00000000                  mov     rdi, 0
+   168 0000018B BA01000000                  mov     rdx, 1          ; read ONE byte at a time
+   169 00000190 0F05                        syscall
+   170 00000192 4883F801                    cmp     rax, 1
+   171 00000196 7513                        jne     .read_done      ; EOF or error
+   172 00000198 490FB6041C                  movzx   rax, byte [r12 + rbx]
+   173 0000019D 3C0A                        cmp     al, 10          ; newline = end of line
+   174 0000019F 740A                        je      .read_done
+   175 000001A1 4C39EB                      cmp     rbx, r13        ; past buffer limit?
+   176 000001A4 7DD7                        jge     .read_char      ; keep reading to drain, but don't store
+   177 000001A6 48FFC3                      inc     rbx
+   178 000001A9 EBD2                        jmp     .read_char
+   179                                  .read_done:
+   180 000001AB 4889D8                      mov     rax, rbx
+   181 000001AE 415D                        pop     r13
+   182 000001B0 415C                        pop     r12
+   183 000001B2 5B                          pop     rbx
+   184 000001B3 C3                          ret
+   185                                  
+   186                                  ; -------------------------------------------------------
+   187                                  ; string_to_integer | rsi = input string, rdx = byte count
+   188                                  ; returns: rax = integer, or -1 on invalid input
+   189                                  ; The scan is bounded by rdx so it never reads past input.
+   190                                  ; -------------------------------------------------------
+   191                                  string_to_integer:
+   192 000001B4 4831C0                      xor     rax, rax
+   193 000001B7 4831C9                      xor     rcx, rcx
+   194                                  .next_char:
+   195 000001BA 4839D1                      cmp     rcx, rdx                    ; stop at byte count
+   196 000001BD 7D35                        jge     .done
+   197 000001BF 4C0FB6040E                  movzx   r8, byte [rsi+rcx]
+   198 000001C4 4180F80A                    cmp     r8b, 10                     ; newline
+   199 000001C8 742A                        je      .done
+   200 000001CA 4180F800                    cmp     r8b, 0                      ; null terminator
+   201 000001CE 7424                        je      .done
+   202 000001D0 4180F830                    cmp     r8b, '0'
+   203 000001D4 7C16                        jl      .invalid
+   204 000001D6 4180F839                    cmp     r8b, '9'
+   205 000001DA 7F10                        jg      .invalid
+   206 000001DC 4180E830                    sub     r8b, '0'
+   207 000001E0 486BC00A                    imul    rax, 10
+   208 000001E4 4C01C0                      add     rax, r8
+   209 000001E7 48FFC1                      inc     rcx
+   210 000001EA EBCE                        jmp     .next_char
+   211                                  .invalid:
+   212 000001EC 48C7C0FFFFFFFF              mov     rax, -1                     ; invalid character found
+   213 000001F3 C3                          ret
+   214                                  .done:
+   215 000001F4 C3                          ret
+   216                                  
+   217                                  ; -------------------------------------------------------
+   218                                  ; integer_to_string | rax = number, rdi = output buffer
+   219                                  ; returns: rax = pointer to string, rdx = length
+   220                                  ; -------------------------------------------------------
+   221                                  integer_to_string:
+   222 000001F5 53                          push    rbx                         ; preserve callee-saved register
+   223 000001F6 B900000000                  mov     rcx, 0
+   224 000001FB BB0A000000                  mov     rbx, 10
+   225                                  .extract_digits:
+   226 00000200 4831D2                      xor     rdx, rdx
+   227 00000203 48F7F3                      div     rbx
+   228 00000206 80C230                      add     dl, '0'
+   229 00000209 52                          push    rdx
+   230 0000020A 48FFC1                      inc     rcx
+   231 0000020D 4885C0                      test    rax, rax
+   232 00000210 75EE                        jnz     .extract_digits
+   233 00000212 4889F8                      mov     rax, rdi
+   234 00000215 4989C8                      mov     r8, rcx
+   235                                  .write_digits:
+   236 00000218 5A                          pop     rdx
+   237 00000219 8817                        mov     [rdi], dl
+   238 0000021B 48FFC7                      inc     rdi
+   239 0000021E E2F8                        loop    .write_digits
+   240 00000220 4C89C2                      mov     rdx, r8
+   241 00000223 5B                          pop     rbx                         ; restore rbx before return
+   242 00000224 C3                          ret

@@ -152,12 +152,35 @@ print_string:
 
 ; -------------------------------------------------------
 ; read_input | rsi = buffer, rdx = max length
-; returns: rax = bytes read
+; returns: rax = bytes stored (excess input is discarded)
 ; -------------------------------------------------------
 read_input:
-    mov     rax, 0                      ; syscall: read
-    mov     rdi, 0                      ; stdin
+    push    rbx
+    push    r12
+    push    r13
+    mov     r12, rsi        ; save buffer base
+    mov     r13, rdx        ; save max length
+    xor     rbx, rbx        ; byte count = 0
+.read_char:
+    lea     rsi, [r12 + rbx]
+    mov     rax, 0
+    mov     rdi, 0
+    mov     rdx, 1          ; read ONE byte at a time
     syscall
+    cmp     rax, 1
+    jne     .read_done      ; EOF or error
+    movzx   rax, byte [r12 + rbx]
+    cmp     al, 10          ; newline = end of line
+    je      .read_done
+    cmp     rbx, r13        ; past buffer limit?
+    jge     .read_char      ; keep reading to drain, but don't store
+    inc     rbx
+    jmp     .read_char
+.read_done:
+    mov     rax, rbx
+    pop     r13
+    pop     r12
+    pop     rbx
     ret
 
 ; -------------------------------------------------------
