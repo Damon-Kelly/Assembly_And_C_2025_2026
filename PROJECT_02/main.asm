@@ -1,3 +1,10 @@
+; -------------------------------------------------------
+; Name: Damon Kelly
+; Student ID: C00307057
+; Date: 29/04/2026
+; Purpose: Adds 2 numbers together 3 times, each time printing the result and then prints the total sum at the end
+; -------------------------------------------------------
+
 global run_sum
 global register_adder
 global string_to_integer
@@ -158,22 +165,22 @@ read_input:
     push    rbx
     push    r12
     push    r13
-    mov     r12, rsi        ; save buffer base
-    mov     r13, rdx        ; save max length
-    xor     rbx, rbx        ; byte count = 0
+    mov     r12, rsi                    ; save buffer base
+    mov     r13, rdx                    ; save max length
+    xor     rbx, rbx                    ; byte count = 0
 .read_char:
     lea     rsi, [r12 + rbx]
     mov     rax, 0
     mov     rdi, 0
-    mov     rdx, 1          ; read ONE byte at a time
+    mov     rdx, 1                      ; read ONE byte at a time
     syscall
     cmp     rax, 1
-    jne     .read_done      ; EOF or error
+    jne     .read_done                  ; EOF or error
     movzx   rax, byte [r12 + rbx]
-    cmp     al, 10          ; newline = end of line
+    cmp     al, 10                      ; newline = end of line
     je      .read_done
-    cmp     rbx, r13        ; past buffer limit?
-    jge     .read_char      ; keep reading to drain, but don't store
+    cmp     rbx, r13                    ; is it past buffer limit?
+    jge     .read_char                  ; keep reading to drain, but don't store
     inc     rbx
     jmp     .read_char
 .read_done:
